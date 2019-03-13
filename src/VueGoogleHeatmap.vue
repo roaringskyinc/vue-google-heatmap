@@ -21,6 +21,16 @@ export default {
       type: Number,
       default: () => 13
     },
+    opacity: {
+      type: Number,
+      default: () => 0.6
+    },
+    gradient: {
+      type: Array
+    },
+    radius: {
+      type: Number
+    },
     mapType: {
       type: String,
       default: () => 'roadmap'
@@ -69,10 +79,21 @@ export default {
         mapTypeId: this.mapType
       });
 
-      this.$heatmap = new google.maps.visualization.HeatmapLayer({
+      const heatmapConfig = {
         data: this.heatmapPoints,
-        map: this.$mapObject
-      });
+        map: this.$mapObject,
+        opacity: this.opacity
+      };
+      
+      if (this.gradient) {
+        heatmapConfig.gradient = this.gradient;
+      };
+      
+      if (this.radius) {
+        heatmapConfig.radius = this.radius;
+      };
+
+      this.$heatmap = new google.maps.visualization.HeatmapLayer(heatmapConfig);
 
       this.$heatmap.setMap(this.$mapObject);
     });
