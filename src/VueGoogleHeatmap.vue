@@ -223,6 +223,7 @@ export default {
         zoom: this.initialZoom,
         center: { lat: this.lat, lng: this.lng },
         mapTypeId: this.mapType,
+        streetViewControl: false,
         styles: this.mapStyle,
       });
     });
