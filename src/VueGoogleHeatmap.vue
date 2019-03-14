@@ -1,6 +1,5 @@
 <template>
-  <div ref="map"
-       :style="`width: ${mapWidth}; height: ${mapHeight}`"></div>
+  <div ref="map" :style="`width: ${mapWidth}; height: ${mapHeight}`"></div>
 </template>
 
 <script>
@@ -11,42 +10,61 @@ export default {
   props: {
     lat: {
       type: Number,
-      default: () => 37.775
+      default: () => 37.775,
     },
     lng: {
       type: Number,
-      default: () => -122.434
+      default: () => -122.434,
     },
     initialZoom: {
       type: Number,
-      default: () => 13
+      default: () => 13,
     },
     opacity: {
       type: Number,
-      default: () => 0.6
+      default: () => 0.6,
     },
     gradient: {
-      type: Array
+      type: Array,
     },
     radius: {
-      type: Number
+      type: Number,
     },
     mapType: {
       type: String,
-      default: () => 'roadmap'
+      default: () => 'roadmap',
     },
     points: {
       type: Array,
-      required: true
+      required: true,
     },
     width: {
       type: [String, Number],
-      default: () => '100%'
+      default: () => '100%',
     },
     height: {
       type: [String, Number],
-      default: () => '100%'
-    }
+      default: () => '100%',
+    },
+  },
+  watch: {
+    points: function(old) {
+      if (this.$heatmap) {
+        this.$heatmap.setData(this.heatmapPoints);
+      } else {
+        const heatmapConfig = {
+          data: this.heatmapPoints,
+          map: this.$mapObject,
+          opacity: this.opacity,
+        };
+        if (this.gradient) heatmapConfig.gradient = this.gradient;
+        if (this.radius) heatmapConfig.radius = this.radius;
+        this.$heatmap = new google.maps.visualization.HeatmapLayer(
+          heatmapConfig,
+        );
+        this.$heatmap.setMap(this.$mapObject);
+      }
+    },
   },
   computed: {
     mapWidth() {
@@ -65,41 +83,19 @@ export default {
     },
     heatmapPoints() {
       return this.points.map(
-        point => new google.maps.LatLng(point.lat, point.lng)
+        (point) => new google.maps.LatLng(point.lat, point.lng),
       );
-    }
+    },
   },
   created() {
     return loaded.then(() => {
       const mapElement = this.$refs.map;
-
       this.$mapObject = new google.maps.Map(mapElement, {
         zoom: this.initialZoom,
         center: { lat: this.lat, lng: this.lng },
-        mapTypeId: this.mapType
+        mapTypeId: this.mapType,
       });
-
-      const heatmapConfig = {
-        data: this.heatmapPoints,
-        map: this.$mapObject,
-        opacity: this.opacity
-      };
-      
-      if (this.gradient) {
-        heatmapConfig.gradient = this.gradient;
-      };
-      
-      if (this.radius) {
-        heatmapConfig.radius = this.radius;
-      };
-
-      this.$heatmap = new google.maps.visualization.HeatmapLayer(heatmapConfig);
-
-      this.$heatmap.setMap(this.$mapObject);
     });
-  }
+  },
 };
 </script>
-
-
-
